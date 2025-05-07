@@ -41,7 +41,7 @@ def bingx_order(symbol, side, type_, quantity):
 @app.route("/bingx", methods=["POST"])
 def webhook():
     try:
-        data = request.json
+        data = request.form
         print("📩 收到訊號：", data)
         result = bingx_order(
             symbol=data["symbol"],
