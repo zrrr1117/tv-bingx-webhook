@@ -8,37 +8,39 @@ API_KEY = os.getenv("BINGX_API_KEY")
 API_SECRET = os.getenv("BINGX_API_SECRET")
 
 def bingx_order(symbol, side, type_, quantity):
-    timestamp = str(int(time.time() * 1000))
     url = "https://open-api.bingx.com/openApi/swap/v2/trade/order"
+    timestamp = str(int(time.time() * 1000))
 
     params = {
         "symbol": symbol,
         "side": side.upper(),
-        "type": type_.upper(),  # e.g. MARKET or LIMIT
+        "type": type_.upper(),
         "quantity": quantity,
         "timestamp": timestamp,
         "recvWindow": "5000"
     }
 
-    query_string = urlencode(sorted(params.items()))
-    signature = hmac.new(API_SECRET.encode(), query_string.encode(), hashlib.sha256).hexdigest()
+    # 正確方式：query string 必須 sorted + urlencode，再簽名
+    sorted_query = urlencode(sorted(params.items()))
+    signature = hmac.new(API_SECRET.encode(), sorted_query.encode(), hashlib.sha256).hexdigest()
+
+    # 加入 signature
     params["signature"] = signature
 
     headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-BX-APIKEY": API_KEY
+        "X-BX-APIKEY": API_KEY,
+        "Content-Type": "application/x-www-form-urlencoded"
     }
 
-    # Debug print
-    print("🔍 PARAMS SENT:", params)
-    print("🔐 SIGNATURE:", signature)
+    print("🧾 Final Params:", params)
+    print("🔐 Signature:", signature)
 
-    response = requests.post(url, headers=headers, data=params)
-    return response.json()
+    # 用 form 傳送
+    return requests.post(url, headers=headers, data=params).json()
 
 @app.route("/bingx", methods=["POST"])
 def webhook():
-    # 🚨 接收的是 form 資料，因為你從 PowerShell 發送的是 urlencoded
+    # PowerShell 預設是 x-www-form-urlencoded 格式
     data = request.form
 
     try:
@@ -54,6 +56,4 @@ def webhook():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-
 
