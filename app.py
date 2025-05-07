@@ -24,7 +24,7 @@ def bingx_order(symbol, side, type_, quantity):
     signature = hmac.new(API_SECRET.encode(), query.encode(), hashlib.sha256).hexdigest()
     params["signature"] = signature
 
-    headers = { "X-BX-APIKEY": API_KEY }
+    headers = {"X-BX-APIKEY": API_KEY}
 
     return requests.post(url, headers=headers, data=params).json()
 
@@ -39,7 +39,10 @@ def webhook():
         quantity=data["quantity"]
     )
     return {"status": "done", "result": result}
-  if __name__ == "__main__":
+
+# ✅ 加上這段才能在 Render 正常啟動
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
 
