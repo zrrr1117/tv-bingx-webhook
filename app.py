@@ -6,6 +6,9 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("BINGX_API_KEY")
 API_SECRET = os.getenv("BINGX_API_SECRET")
+print("✅ API_KEY:", API_KEY)
+print("✅ API_SECRET:", API_SECRET)
+
 
 def bingx_order(symbol, side, type_, quantity):
     url = "https://open-api.bingx.com/openApi/swap/v2/trade/order"
