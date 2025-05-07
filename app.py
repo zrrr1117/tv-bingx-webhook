@@ -13,17 +13,23 @@ def bingx_order(symbol, side, type_, quantity):
     params = {
         "symbol": symbol,
         "side": side.upper(),
-        "type": type_.upper(),  # MARKET or LIMIT
-        "price": "",  # 若為 LIMIT 請補上價格
+        "type": type_.upper(),
+        "price": "",  # 如果是 LIMIT 記得自行補價格
         "quantity": quantity,
         "timestamp": timestamp,
         "recvWindow": "5000"
     }
 
-    # 依照 BingX 要求的順序進行簽名
     query = "&".join([f"{k}={v}" for k, v in sorted(params.items()) if v != ""])
     signature = hmac.new(API_SECRET.encode(), query.encode(), hashlib.sha256).hexdigest()
     params["signature"] = signature
+
+    # ✅ Debug 資訊（測完可以刪）
+    print("=== DEBUG SIGNATURE ===")
+    print("Query string:", query)
+    print("Signature:", signature)
+    print("API_KEY:", API_KEY)
+    print("API_SECRET:", API_SECRET)
 
     headers = {"X-BX-APIKEY": API_KEY}
     response = requests.post(url, headers=headers, data=params)
