@@ -5,7 +5,7 @@ services:
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python app.py"
     envVars:
-      - key: BINGX_API_KEY
+      - key: rZW7xP1YSgdSh54oNykaxjbQywhUORW2KHi5vU0hJuMGhOBhVvrTXxslHRIsomIzeQWo5NiHlQtaXyxDQu2YQ
         sync: false
-      - key: BINGX_API_SECRET
+      - key: MofysyIyxGfIFubTPc8hmVbf565AZ0y9mHsLV8vFWqE1tNVBjHoF56Ka6g5VdOsNfpx9cHV6xXHaqtxw
         sync: false
