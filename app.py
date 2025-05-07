@@ -10,30 +10,33 @@ def bingx_order(symbol, side, type_, quantity):
     timestamp = str(int(time.time() * 1000))
     url = "https://open-api.bingx.com/openApi/swap/v2/trade/order"
 
+    # ✅ 不要放空的 price（BingX 明確說空值也會被簽進去）
     params = {
         "symbol": symbol,
         "side": side.upper(),
         "type": type_.upper(),
-        "price": "",  # 如果是 LIMIT 記得自行補價格
         "quantity": quantity,
         "timestamp": timestamp,
         "recvWindow": "5000"
     }
 
-    query = "&".join([f"{k}={v}" for k, v in sorted(params.items()) if v != ""])
+    # ✅ 用 urlencode 排除問題（符合 BingX 簽名需求）
+    from urllib.parse import urlencode
+    query = urlencode(sorted(params.items()))
     signature = hmac.new(API_SECRET.encode(), query.encode(), hashlib.sha256).hexdigest()
     params["signature"] = signature
 
-    # ✅ Debug 資訊（測完可以刪）
+    # ✅ Debug 輸出
     print("=== DEBUG SIGNATURE ===")
     print("Query string:", query)
     print("Signature:", signature)
-    print("API_KEY:", API_KEY)
-    print("API_SECRET:", API_SECRET)
+    print("API_KEY:", API_KEY[:6] + "..." + API_KEY[-6:])  # 安全遮掩
+    print("API_SECRET:", API_SECRET[:6] + "..." + API_SECRET[-6:])
 
     headers = {"X-BX-APIKEY": API_KEY}
     response = requests.post(url, headers=headers, data=params)
     return response.json()
+
 
 @app.route("/bingx", methods=["POST"])
 def webhook():
